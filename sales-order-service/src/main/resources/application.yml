@@ -1,0 +1,46 @@
+spring: 
+  profiles: 
+    active: prod
+    
+  application: 
+    name: sales-order-service
+---
+server:
+  port: 3333
+  
+spring:
+  profiles: dev
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  datasource:
+    url: jdbc:h2:~/test3
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+url: http://localhost:2222/items/{itemName}
+
+---
+server:
+  port: 3331
+  
+spring:
+  profiles: prod
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  datasource:
+    url: jdbc:h2:~/test3
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+url: http://localhost:2221/items/{itemName}
+    
