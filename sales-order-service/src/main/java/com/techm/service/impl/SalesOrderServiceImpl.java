@@ -1,7 +1,9 @@
 package com.techm.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -50,12 +52,6 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 		return customerRepository.save(customer);
 	}
 
-	@HystrixCommand(fallbackMethod="failoverMethod",
-			//onFallbackError="failoverMethod",
-			commandProperties={
-			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="5000"),
-			@HystrixProperty(name="execution.isolation.strategy", value="SEMAPHORE")
-		})
 	public String  add(Order order) throws CustomerNotFoundException{
 
 		Map<String,Integer> itemMap=order.getItem();		
@@ -89,10 +85,6 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 		return "Order received successfuly";
 	}
 	
-	public String failoverMethod(Order order) {
-		return "Item service is not available, please try after some time. Thank You!";
-	}
-	
 	public boolean validateCustomer(Long id) {		
 		Optional<Customer_SOS> cust=customerRepository.findById(id);
 		if(cust.isPresent()) {
@@ -106,4 +98,27 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 		String url = instance.getUri().toString();
 		return url;
 	}
+
+	@HystrixCommand(fallbackMethod="getDefaultItemList")
+//			,
+			//onFallbackError="failoverMethod",
+//			commandProperties={
+//			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="5000"),
+//			@HystrixProperty(name="execution.isolation.strategy", value="SEMAPHORE")
+//		})
+	public List<Item> getItemList() {
+		String url = getServiceUrl("ITEM-SERVICE");
+		List<Item> itemList = restTemplate.getForObject(url+"/items", List.class);
+		return itemList;
+	}
+	
+	public List<Item> getDefaultItemList() {
+		List<Item> defaultItemList = new ArrayList<>();
+		defaultItemList.add(new Item("AC", "AC", 100));
+		defaultItemList.add(new Item("Laptop", "Laptop", 500));
+		defaultItemList.add(new Item("HD", "HD", 120));
+
+		return defaultItemList;
+	}
+	
 }

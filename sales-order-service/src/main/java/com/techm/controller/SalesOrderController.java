@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.techm.entity.Customer_SOS;
+import com.techm.entity.Item;
 import com.techm.entity.Order;
 import com.techm.entity.Order_Line_Item;
 import com.techm.service.OrderLineItemService;
@@ -33,6 +34,11 @@ public class SalesOrderController {
 	
 	@Autowired
 	SalesOrderService salesOrderService;
+	
+	@GetMapping("/items")
+	public List<Item> getItemList(){
+		return salesOrderService.getItemList();
+	}
 	
 	@PostMapping("/orders")	
 	public String createOrder(@RequestBody Order order) {
